@@ -8,13 +8,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.gogenie.customer.orderservice.exception.CustomerOrderServiceException;
-import com.gogenie.customer.orderservice.model.OrderRequest;
+import com.gogenie.customer.orderservice.model.SubmitOrder;
 
 @RestController
 public class OrderServiceController {
 
 	@RequestMapping(value = "/submit", method = RequestMethod.POST)
-	public String submitAnOrder(@RequestBody OrderRequest request, BindingResult result)
+	public String submitAnOrder(@RequestBody SubmitOrder request, BindingResult result)
 			throws CustomerOrderServiceException {
 		return null;
 	}
@@ -38,7 +38,7 @@ public class OrderServiceController {
 	}
 
 	@RequestMapping(value = "/reorder", method = RequestMethod.POST)
-	public String submitOneMoreOrderUsingExistingOrderDetails(@RequestBody OrderRequest request, BindingResult result) throws CustomerOrderServiceException {
+	public String submitOneMoreOrderUsingExistingOrderDetails(@RequestBody SubmitOrder request, BindingResult result) throws CustomerOrderServiceException {
 		return null;
 	}
 
