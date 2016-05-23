@@ -2,6 +2,7 @@ package com.gogenie.customer.orderservice.dao.impl;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -76,7 +77,10 @@ public class OrderTrackingDAOImpl implements OrderTrackingDAO {
 	}
 
 	public String addOrderAsCustomerFav(Integer customerId, Integer orderId) throws CustomerOrderServiceException {
-		// TODO Auto-generated method stub
+		SimpleJdbcInsert addCustFavOrder = new SimpleJdbcInsert(orderTrackingSource).withTableName("cust_fav_order");
+		Map<String, Object> favorites = new HashMap<String, Object>();
+		favorites.put("cust_id", customerId);
+		favorites.put("order_id", orderId);
 		return null;
 	}
 
