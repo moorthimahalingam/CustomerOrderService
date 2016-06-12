@@ -34,13 +34,16 @@ public class OrderTrackingDAOImpl implements OrderTrackingDAO {
 	@PostConstruct
 	private void setupDataSource() {
 		jdbcTemplate = new JdbcTemplate(orderTrackingSource);
-		jdbcCall = new SimpleJdbcCall(jdbcTemplate);
+
 	}
 
 	public OrderDetailResponse submitAnOrder(SubmitOrder request) throws CustomerOrderServiceException {
 		OrderDetailResponse orderDetailResponse = null;
 		try {
-			SimpleJdbcInsert submitOrder = new SimpleJdbcInsert(jdbcTemplate).withTableName("customer_order_detail").usingGeneratedKeyColumns("order_id");
+			jdbcCall = new SimpleJdbcCall(jdbcTemplate);
+
+			SimpleJdbcInsert submitOrder = new SimpleJdbcInsert(jdbcTemplate).withTableName("customer_order_detail")
+					.usingGeneratedKeyColumns("order_id");
 			Number generated_orderId = submitOrder.executeAndReturnKey(orderDataMap(request));
 			orderDetailResponse = new OrderDetailResponse();
 			orderDetailResponse.setOrderId(generated_orderId.intValue());
@@ -53,11 +56,13 @@ public class OrderTrackingDAOImpl implements OrderTrackingDAO {
 	public OrderDetailResponse orderStatusOfAnExistingOrder(Integer orderId) throws CustomerOrderServiceException {
 		OrderDetailResponse response;
 		try {
-			String orderStatus = jdbcTemplate.queryForObject("select order_status from customer_order_detail where order_id=?",new Object[]{orderId}, String.class);
+			String orderStatus = jdbcTemplate.queryForObject(
+					"select order_status from customer_order_detail where order_id=?", new Object[] { orderId },
+					String.class);
 			response = new OrderDetailResponse();
 			response.setOrderId(orderId);
 			response.setOrderStatus(orderStatus);
-			
+
 		} catch (Exception e) {
 			throw new CustomerOrderServiceException(e, "orderStatusOfAnExistingOrder");
 		}
@@ -66,12 +71,13 @@ public class OrderTrackingDAOImpl implements OrderTrackingDAO {
 
 	public List<OrderDetailResponse> retrieveCustomerOrdersHistory(Integer customerId)
 			throws CustomerOrderServiceException {
-		jdbcTemplate.queryForObject("select * from customer_order_detail where cust_id=?",new Object[]{customerId}, new RowMapper<List<OrderDetailResponse>>() {
-			public List<OrderDetailResponse> mapRow(ResultSet rs, int rowNum) throws SQLException {
-				return null;
-			}
+		jdbcTemplate.queryForObject("select * from customer_order_detail where cust_id=?", new Object[] { customerId },
+				new RowMapper<List<OrderDetailResponse>>() {
+					public List<OrderDetailResponse> mapRow(ResultSet rs, int rowNum) throws SQLException {
+						return null;
+					}
 
-		});
+				});
 		// TODO Auto-generated method stub
 		return null;
 	}
