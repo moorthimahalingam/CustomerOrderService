@@ -23,14 +23,16 @@ public class Menu implements Serializable {
 	private String name;
 	@JsonProperty("price")
 	private Double price;
-	@JsonProperty("spiceLevel")
-	private String spiceLevel;
-	@JsonProperty("specialInstruction")
+	@JsonProperty("spice_level")
+	private Integer spiceLevel;
+	@JsonProperty("special_instruction")
 	private String specialInstruction;
 	@JsonProperty("quantity")
 	private Integer quantity;
 	@JsonProperty("cuisine_id")
 	private Integer cuisineId;
+	@JsonProperty("item_size")
+	private Integer itemSize;
 	@JsonIgnore
 	private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
@@ -95,8 +97,8 @@ public class Menu implements Serializable {
 	 * 
 	 * @return The spiceLevel
 	 */
-	@JsonProperty("spiceLevel")
-	public String getSpiceLevel() {
+	@JsonProperty("spice_level")
+	public Integer getSpiceLevel() {
 		return spiceLevel;
 	}
 
@@ -105,8 +107,8 @@ public class Menu implements Serializable {
 	 * @param spiceLevel
 	 *            The spiceLevel
 	 */
-	@JsonProperty("spiceLevel")
-	public void setSpiceLevel(String spiceLevel) {
+	@JsonProperty("spice_level")
+	public void setSpiceLevel(Integer spiceLevel) {
 		this.spiceLevel = spiceLevel;
 	}
 
@@ -114,7 +116,7 @@ public class Menu implements Serializable {
 	 * 
 	 * @return The specialInstruction
 	 */
-	@JsonProperty("specialInstruction")
+	@JsonProperty("special_instruction")
 	public String getSpecialInstruction() {
 		return specialInstruction;
 	}
@@ -124,7 +126,7 @@ public class Menu implements Serializable {
 	 * @param specialInstruction
 	 *            The specialInstruction
 	 */
-	@JsonProperty("specialInstruction")
+	@JsonProperty("special_instruction")
 	public void setSpecialInstruction(String specialInstruction) {
 		this.specialInstruction = specialInstruction;
 	}
@@ -165,6 +167,16 @@ public class Menu implements Serializable {
 	@JsonProperty("cuisine_id")
 	public void setCuisineId(Integer cuisineId) {
 		this.cuisineId = cuisineId;
+	}
+	
+	@JsonProperty("item_size")
+	public Integer getItemSize() {
+		return itemSize;
+	}
+
+	@JsonProperty("item_size")
+	public void setItemSize(Integer itemSize) {
+		this.itemSize = itemSize;
 	}
 
 	@JsonAnyGetter

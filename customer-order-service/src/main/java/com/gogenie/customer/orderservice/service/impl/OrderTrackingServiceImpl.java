@@ -5,6 +5,8 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.gogenie.customer.orderservice.dao.OrderTrackingDAO;
@@ -17,26 +19,36 @@ import com.gogenie.customer.orderservice.service.OrderTrackingService;
 @Service
 public class OrderTrackingServiceImpl implements OrderTrackingService {
 
+	Logger logger = LoggerFactory.getLogger(OrderTrackingServiceImpl.class);
+	
 	@Inject
-	OrderTrackingDAO serviceDao;
+	OrderTrackingDAO orderServiceDao;
 
 	public OrderDetailResponse submitAnOrder(SubmitOrder request) throws CustomerOrderServiceException {
-		OrderDetailResponse response = serviceDao.submitAnOrder(request);
+		logger.debug("Entering into submitAnOrder()");
+		OrderDetailResponse response = orderServiceDao.submitAnOrder(request);
+		logger.debug("Exiting from submitAnOrder()");
 		return response;
 	}
 
 	public OrderDetailResponse trackAnExistingOrder(Integer orderId) throws CustomerOrderServiceException {
-		OrderDetailResponse response = serviceDao.orderStatusOfAnExistingOrder(orderId);
+		logger.debug("Entering into trackAnExistingOrder()");
+		OrderDetailResponse response = orderServiceDao.orderStatusOfAnExistingOrder(orderId);
+		logger.debug("Exiting from trackAnExistingOrder()");
 		return response;
 	}
 
 	public List<OrderDetailResponse> historyOfOrders(Integer customerId) throws CustomerOrderServiceException {
-		List<OrderDetailResponse> history = serviceDao.retrieveCustomerOrdersHistory(customerId);
+		logger.debug("Entering into historyOfOrders()");
+		List<OrderDetailResponse> history = orderServiceDao.retrieveCustomerOrdersHistory(customerId);
+		logger.debug("Exiting from historyOfOrders()");
 		return history;
 	}
 
 	public String addOrderAsCustomerFav(Integer customerId, Integer orderId) throws CustomerOrderServiceException {
-		String addOrderFav = serviceDao.addOrderAsCustomerFav(customerId, orderId);
+		logger.debug("Entering into addOrderAsCustomerFav()");
+		String addOrderFav = orderServiceDao.addOrderAsCustomerFav(customerId, orderId);
+		logger.debug("Exiting from addOrderAsCustomerFav()");
 		return addOrderFav;
 	}
 
