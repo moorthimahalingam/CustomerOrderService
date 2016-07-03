@@ -10,11 +10,11 @@ public interface OrderTrackingService {
 
 	public OrderDetailResponse submitAnOrder(SubmitOrder request) throws CustomerOrderServiceException;
 
-	public OrderDetailResponse trackAnExistingOrder(Integer orderId) throws CustomerOrderServiceException;
+	public OrderDetailResponse trackAnExistingOrder(Long orderId) throws CustomerOrderServiceException;
 	
 	public List<OrderDetailResponse> historyOfOrders(Integer customerId) throws CustomerOrderServiceException;
 	
-	public String addOrderAsCustomerFav(Integer customerId, Integer orderId) throws CustomerOrderServiceException;
+	public String addOrderAsCustomerFav(Integer customerId, Long orderId) throws CustomerOrderServiceException;
 
 }
 

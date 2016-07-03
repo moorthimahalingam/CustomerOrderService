@@ -31,7 +31,7 @@ public class OrderTrackingServiceImpl implements OrderTrackingService {
 		return response;
 	}
 
-	public OrderDetailResponse trackAnExistingOrder(Integer orderId) throws CustomerOrderServiceException {
+	public OrderDetailResponse trackAnExistingOrder(Long orderId) throws CustomerOrderServiceException {
 		logger.debug("Entering into trackAnExistingOrder()");
 		OrderDetailResponse response = orderServiceDao.orderStatusOfAnExistingOrder(orderId);
 		logger.debug("Exiting from trackAnExistingOrder()");
@@ -45,7 +45,7 @@ public class OrderTrackingServiceImpl implements OrderTrackingService {
 		return history;
 	}
 
-	public String addOrderAsCustomerFav(Integer customerId, Integer orderId) throws CustomerOrderServiceException {
+	public String addOrderAsCustomerFav(Integer customerId, Long orderId) throws CustomerOrderServiceException {
 		logger.debug("Entering into addOrderAsCustomerFav()");
 		String addOrderFav = orderServiceDao.addOrderAsCustomerFav(customerId, orderId);
 		logger.debug("Exiting from addOrderAsCustomerFav()");

@@ -16,7 +16,7 @@ public class OrderDetailResponse implements Serializable {
 	private static final long serialVersionUID = 350995320542034436L;
 	
 	@JsonProperty("order_id")
-	private Integer orderId;
+	private Long orderId;
 
 	@JsonProperty("customer_id")
 	private String customerId;
@@ -28,12 +28,12 @@ public class OrderDetailResponse implements Serializable {
 	private List<Menu> Menus = new ArrayList<Menu>();
 	
 	@JsonProperty("order_id")
-	public Integer getOrderId() {
+	public Long getOrderId() {
 		return orderId;
 	}
 
 	@JsonProperty("order_id")
-	public void setOrderId(Integer orderId) {
+	public void setOrderId(Long orderId) {
 		this.orderId = orderId;
 	}
 

@@ -45,7 +45,7 @@ public class OrderServiceController {
 	}
 
 	@RequestMapping(value = "/status", method = RequestMethod.GET)
-	public OrderDetailResponse retrieveOrderCurrentStatus(@RequestParam(value = "orderId") Integer orderId)
+	public OrderDetailResponse retrieveOrderCurrentStatus(@RequestParam(value = "orderId") Long orderId)
 			throws CustomerOrderServiceException {
 		logger.debug("Entering into retrieveOrderCurrentStatus()");
 		OrderDetailResponse response = service.trackAnExistingOrder(orderId);
@@ -54,7 +54,7 @@ public class OrderServiceController {
 	}
 
 	@RequestMapping(value = "/addToFavorite", method = RequestMethod.PUT)
-	public String addOrderAsFavorite(@RequestParam(value = "orderId") Integer orderId,
+	public String addOrderAsFavorite(@RequestParam(value = "orderId") Long orderId,
 			@RequestParam(value = "customerId") Integer customerId) throws CustomerOrderServiceException {
 		logger.debug("Entering into addOrderAsFavorite()");
 		String status = service.addOrderAsCustomerFav(customerId, orderId);

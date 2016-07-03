@@ -3,6 +3,7 @@ package com.gogenie.customer.orderservice.dao.impl;
 import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -16,14 +17,23 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.SqlOutParameter;
+import org.springframework.jdbc.core.SqlParameter;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcCall;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 import com.gogenie.customer.orderservice.dao.OrderTrackingDAO;
 import com.gogenie.customer.orderservice.exception.CustomerOrderServiceException;
+import com.gogenie.customer.orderservice.model.Menu;
 import com.gogenie.customer.orderservice.model.OrderDetailResponse;
 import com.gogenie.customer.orderservice.model.SubmitOrder;
+import com.gogenie.customer.orderservice.util.OrderSubmit;
+import com.gogenie.customer.orderservice.util.SubmitOrderItemDetails;
 
 @Repository
 public class OrderTrackingDAOImpl implements OrderTrackingDAO {
@@ -39,9 +49,13 @@ public class OrderTrackingDAOImpl implements OrderTrackingDAO {
 
 	private JdbcTemplate jdbcTemplate;
 
+	private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
+
 	@PostConstruct
 	public void setupDataSource() {
 		jdbcTemplate = new JdbcTemplate(gogenieDataSource);
+		namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(gogenieDataSource);
+		jdbcCall = new SimpleJdbcCall(gogenieDataSource);
 		jdbcInsert = new SimpleJdbcInsert(gogenieDataSource);
 
 	}
@@ -49,23 +63,47 @@ public class OrderTrackingDAOImpl implements OrderTrackingDAO {
 	public OrderDetailResponse submitAnOrder(SubmitOrder request) throws CustomerOrderServiceException {
 		logger.debug("Entering into submitAnOrder()");
 		OrderDetailResponse orderDetailResponse = null;
+		Long orderId = null;
 		try {
-			jdbcCall = new SimpleJdbcCall(jdbcTemplate);
+			OrderSubmit orderSubmit = new OrderSubmit(gogenieDataSource);
 
-			jdbcInsert.withTableName("customer_order_detail")
-					.usingGeneratedKeyColumns("order_id");
-			Number generated_orderId = jdbcInsert.executeAndReturnKey(orderDataMap(request));
+			Map<String, Object> resultSet = orderSubmit.submitOrderExecute(request);
+
+			logger.debug("Result set is {} after insert the order into DB ", resultSet.toString());
+
+			List<Map> orderIdResult = (List) resultSet.get("#result-set-1");
+
+			logger.debug("Order list {} is ", orderIdResult.toString());
+
+			orderId = (Long) orderIdResult.get(0).get("returnOrderId");
+
+			logger.debug("Order id for this new order is {} ", orderId);
+
+			logger.debug("Begin into Insert Order Item details ");
 			
+			if (orderId > 0) {
+				SubmitOrderItemDetails orderItemDetails = new SubmitOrderItemDetails(gogenieDataSource);
+				for (Menu menu : request.getMenus()) {
+					orderItemDetails.submitMenuOrderItemDetails(menu, orderId);	
+				}
+			}
+			logger.debug("Order Item details inserted successfully ");
 			orderDetailResponse = new OrderDetailResponse();
-			orderDetailResponse.setOrderId(generated_orderId.intValue());
+			orderDetailResponse.setOrderId(orderId);
 		} catch (Exception e) {
+			if (orderId > 0) {
+				jdbcTemplate.execute("delete from order_item_detail where order_id =" + orderId);
+				jdbcTemplate.execute("delete from customer_order where order_id =" + orderId);
+				logger.error("Order Id {} has been revoked ", orderId);
+				logger.error("Rollback the inserted order details from the table");
+			}
 			throw new CustomerOrderServiceException(e, "submitAnOrder");
 		}
 		logger.debug("Exiting from submitAnOrder()");
 		return orderDetailResponse;
 	}
 
-	public OrderDetailResponse orderStatusOfAnExistingOrder(Integer orderId) throws CustomerOrderServiceException {
+	public OrderDetailResponse orderStatusOfAnExistingOrder(Long orderId) throws CustomerOrderServiceException {
 		logger.debug("Entering into orderStatusOfAnExistingOrder()");
 		OrderDetailResponse response;
 		try {
@@ -90,8 +128,8 @@ public class OrderTrackingDAOImpl implements OrderTrackingDAO {
 				new RowMapper<List<OrderDetailResponse>>() {
 					public List<OrderDetailResponse> mapRow(ResultSet rs, int rowNum) throws SQLException {
 						List<OrderDetailResponse> ordersHistoryList = new ArrayList<OrderDetailResponse>();
-						while(rs.next()) {
-							
+						while (rs.next()) {
+
 						}
 						return null;
 					}
@@ -101,7 +139,7 @@ public class OrderTrackingDAOImpl implements OrderTrackingDAO {
 		return null;
 	}
 
-	public String addOrderAsCustomerFav(Integer customerId, Integer orderId) throws CustomerOrderServiceException {
+	public String addOrderAsCustomerFav(Integer customerId, Long orderId) throws CustomerOrderServiceException {
 		logger.debug("Entering into addOrderAsCustomerFav()");
 		jdbcInsert.withTableName("cust_fav_order");
 		Map<String, Object> favorites = new HashMap<String, Object>();
@@ -111,26 +149,19 @@ public class OrderTrackingDAOImpl implements OrderTrackingDAO {
 		return null;
 	}
 
-	private Map<String, Object> orderDataMap(SubmitOrder request) {
-		logger.debug("Entering into orderDataMap()");
-		Map<String, Object> newOrderDetails = new HashMap<String, Object>();
-		
-		newOrderDetails.put("restaurant_id", request.getRestaurantId());
-		newOrderDetails.put("order_status_id", request.getOrderStatusId());
-		newOrderDetails.put("payment_type", request.getPaymentType());
-		newOrderDetails.put("payment_status", request.getPaymentStatus());
-		newOrderDetails.put("special_ins", request.getSpecialInstrn());
-		newOrderDetails.put("total_amount", request.getTotalPrice());
-		newOrderDetails.put("discount", request.getDiscount());
-		newOrderDetails.put("delivery_request_date", request.getDeliveryRequestDate());
-		newOrderDetails.put("delivery_request_time", request.getDeliveryRequestTime());
-		newOrderDetails.put("vat_amount", request.getVatAmount());
-		newOrderDetails.put("service_charge", request.getServiceCharge());
-		newOrderDetails.put("delivery_fee", request.getDeliveryFee());
-		newOrderDetails.put("createdby", 12312321);
-		newOrderDetails.put("createddate", new Date(System.currentTimeMillis()));
-		newOrderDetails.put("contact_phone", request.getContactPhone());
-		logger.debug("Exiting from orderDataMap()");
-		return newOrderDetails;
+	private MapSqlParameterSource orderItemDetailMap(Menu menu, Long orderId) {
+		MapSqlParameterSource orderedMenu = new MapSqlParameterSource();
+		orderedMenu.addValue("order_id", orderId);
+		orderedMenu.addValue("menu_item_id", menu.getMenuId());
+		orderedMenu.addValue("item_name", menu.getName());
+		orderedMenu.addValue("quantity", menu.getQuantity());
+		orderedMenu.addValue("price", menu.getPrice());
+		orderedMenu.addValue("special_ins", menu.getSpecialInstruction());
+		orderedMenu.addValue("spice_level", menu.getSpiceLevel());
+		orderedMenu.addValue("createdby", 12312321);
+		// orderedMenu.addValue("createddate", new
+		// Date(System.currentTimeMillis()));
+		orderedMenu.addValue("menu_item_size", menu.getItemSize());
+		return orderedMenu;
 	}
 }

@@ -10,10 +10,10 @@ public interface OrderTrackingDAO {
 
 	public OrderDetailResponse submitAnOrder(SubmitOrder request) throws CustomerOrderServiceException;
 
-	public OrderDetailResponse orderStatusOfAnExistingOrder(Integer orderId) throws CustomerOrderServiceException;
+	public OrderDetailResponse orderStatusOfAnExistingOrder(Long orderId) throws CustomerOrderServiceException;
 	
 	public List<OrderDetailResponse> retrieveCustomerOrdersHistory(Integer customerId) throws CustomerOrderServiceException;
 	
-	public String addOrderAsCustomerFav(Integer customerId, Integer orderId) throws CustomerOrderServiceException;
+	public String addOrderAsCustomerFav(Integer customerId, Long orderId) throws CustomerOrderServiceException;
 
 }

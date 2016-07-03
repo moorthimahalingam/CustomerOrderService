@@ -16,7 +16,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class SubmitOrder {
 
 	@JsonProperty("order_id")
-	private String orderId;
+	private Long orderId;
 	@JsonProperty("customer_id")
 	private Integer customerId;
 	@JsonProperty("restaurant_id")
@@ -29,7 +29,7 @@ public class SubmitOrder {
 	private Integer orderStatusId;
 	@JsonProperty("Menus")
 	private List<Menu> Menus = new ArrayList<Menu>();
-	@JsonProperty("totalPrice")
+	@JsonProperty("total_price")
 	private Double totalPrice;
 	@JsonProperty("salesTax")
 	private Double salesTax;
@@ -66,7 +66,7 @@ public class SubmitOrder {
 	 * @return The orderId
 	 */
 	@JsonProperty("order_id")
-	public String getOrderId() {
+	public Long getOrderId() {
 		return orderId;
 	}
 
@@ -76,7 +76,7 @@ public class SubmitOrder {
 	 *            The order_id
 	 */
 	@JsonProperty("order_id")
-	public void setOrderId(String orderId) {
+	public void setOrderId(Long orderId) {
 		this.orderId = orderId;
 	}
 
