@@ -8,9 +8,12 @@ import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 @JsonIgnoreProperties(ignoreUnknown=true)
+@JsonInclude(Include.NON_EMPTY)
 public class Menu implements Serializable {
 
 	/**
@@ -18,7 +21,7 @@ public class Menu implements Serializable {
 	 */
 	private static final long serialVersionUID = -3430236567729063503L;
 	@JsonProperty("menu_id")
-	private String menuId;
+	private Integer menuId;
 	@JsonProperty("name")
 	private String name;
 	@JsonProperty("price")
@@ -41,7 +44,7 @@ public class Menu implements Serializable {
 	 * @return The menuId
 	 */
 	@JsonProperty("menu_id")
-	public String getMenuId() {
+	public Integer getMenuId() {
 		return menuId;
 	}
 
@@ -51,7 +54,7 @@ public class Menu implements Serializable {
 	 *            The menu_id
 	 */
 	@JsonProperty("menu_id")
-	public void setMenuId(String menuId) {
+	public void setMenuId(Integer menuId) {
 		this.menuId = menuId;
 	}
 

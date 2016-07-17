@@ -46,7 +46,7 @@
 
 <servlet-mapping>
 	<servlet-name>rest</servlet-name>
-	<url-pattern>/customer-order/*</url-pattern>
+	<url-pattern>/service/*</url-pattern>
 </servlet-mapping>
 
 </web-app>

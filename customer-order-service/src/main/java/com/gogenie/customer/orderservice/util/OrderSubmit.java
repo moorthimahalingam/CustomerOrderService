@@ -26,7 +26,7 @@ public class OrderSubmit extends StoredProcedure {
 		logger.debug("Entering into OrderSubmit() constructor ");
 		declareParameter(new SqlParameter("restaurant_id", Types.BIGINT));
 		declareParameter(new SqlParameter("order_status_id", Types.BIGINT));
-		declareParameter(new SqlParameter("cust_id", Types.BIGINT));
+		declareParameter(new SqlParameter("cust_id", Types.INTEGER));
 		declareParameter(new SqlParameter("payment_type", Types.VARCHAR));
 		declareParameter(new SqlParameter("payment_status", Types.VARCHAR));
 		declareParameter(new SqlParameter("special_ins", Types.VARCHAR));
