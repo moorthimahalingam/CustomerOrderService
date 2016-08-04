@@ -2,6 +2,9 @@ package com.gogenie.customer.orderservice.exception;
 
 public class CustomerOrderServiceException extends Exception {
 
+	private String errorCode;
+	private String errorDesc;
+	
 	/**
 	 * 
 	 */
@@ -24,12 +27,25 @@ public class CustomerOrderServiceException extends Exception {
 		super(throwable);
 	}
 
-	public CustomerOrderServiceException(Exception e , String methodName) {
-		super(e);
+	public CustomerOrderServiceException(Exception e , String errorDetail) {
+		super(errorDetail,e);
 	}
 
-	public CustomerOrderServiceException(Throwable throwable, String methodName) {
-		super(throwable);
+	public CustomerOrderServiceException(Throwable throwable, String errorDtl) {
+		super(errorDtl,throwable);
 	}
 
+	public CustomerOrderServiceException(Throwable throwable, String errorDtl, String errCode,
+			String errDec) {
+		super(errorDtl, throwable);
+		this.errorCode = errCode;
+		this.errorDesc = errDec;
+	}
+	
+	public CustomerOrderServiceException(Exception exception, String errorDtl, String errCode,
+			String errDec) {
+		super(errorDtl, exception);
+		this.errorCode = errCode;
+		this.errorDesc = errDec;
+	}
 }
