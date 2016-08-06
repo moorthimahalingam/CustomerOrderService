@@ -49,5 +49,16 @@
 	<url-pattern>/service/*</url-pattern>
 </servlet-mapping>
 
+<filter>
+    <filter-name>orderServiceCROSFilter</filter-name>
+    <filter-class>
+        com.gogenie.customer.orderservice.controller.OrderServiceCROSFilter
+    </filter-class>
+</filter>
+<filter-mapping>
+    <filter-name>orderServiceCROSFilter</filter-name>
+    <url-pattern>/service/*</url-pattern>
+</filter-mapping>
+
 </web-app>
 

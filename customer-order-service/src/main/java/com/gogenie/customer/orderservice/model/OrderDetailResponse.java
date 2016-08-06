@@ -15,7 +15,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 @JsonIgnoreProperties(ignoreUnknown=true)
-@JsonInclude(Include.NON_EMPTY)
+//@JsonInclude(Include.NON_EMPTY)
 public class OrderDetailResponse implements Serializable {
 
 	/**
