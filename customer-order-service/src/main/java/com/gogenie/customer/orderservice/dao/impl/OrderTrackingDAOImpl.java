@@ -61,9 +61,15 @@ public class OrderTrackingDAOImpl implements OrderTrackingDAO {
 			OrderSubmit orderSubmit = new OrderSubmit(gogenieDataSource);
 			Map<String, Object> resultSet = orderSubmit.submitOrderExecute(request);
 			logger.debug("Result set is {} after insert the order into DB ", resultSet.toString());
-			List<Map> orderIdResult = (List) resultSet.get("#result-set-1");
-			logger.debug("Order list {} is ", orderIdResult.toString());
-			orderId = (Long) orderIdResult.get(0).get("returnOrderId");
+
+			if (resultSet.get("estatus") != null) {
+				errorMessageHandler((String)resultSet.get("estatus"));
+			}
+			
+//			List<Map> orderIdResult = (List) resultSet.get("#result-set-1");
+//			logger.debug("Order list {} is ", orderIdResult.toString());
+//			orderId = (Long) orderIdResult.get(0).get("returnOrderId");
+			orderId = (Long) resultSet.get("sstatus");
 			logger.debug("Order id for this new order is {} ", orderId);
 			logger.debug("Begin into Insert Order Item details ");
 			if (orderId > 0) {
@@ -120,6 +126,17 @@ public class OrderTrackingDAOImpl implements OrderTrackingDAO {
 		favorites.put("order_id", orderId);
 		logger.debug("Exiting from addOrderAsCustomerFav()");
 		return null;
+	}
+
+	/**
+	 * 
+	 * @param errorMessage
+	 * @return
+	 */
+	private void errorMessageHandler(String errorMessage) throws CustomerOrderServiceException {
+		String errorMsg[] = errorMessage.split(":");
+		CustomerOrderServiceException cre = new CustomerOrderServiceException(errorMsg[0], errorMsg[1]);
+		throw cre;
 	}
 	
 }

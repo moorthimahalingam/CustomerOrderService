@@ -41,8 +41,8 @@ public class OrderSubmit extends StoredProcedure {
 		declareParameter(new SqlParameter("createdby", Types.VARCHAR));
 		declareParameter(new SqlParameter("createddate", Types.DATE));
 		declareParameter(new SqlParameter("contact_phone", Types.VARCHAR));
-		declareParameter(new SqlOutParameter("returnOrderId", Types.BIGINT));
-		declareParameter(new SqlOutParameter("error_status", Types.VARCHAR));
+		declareParameter(new SqlOutParameter("estatus", Types.VARCHAR));
+		declareParameter(new SqlOutParameter("sstatus", Types.VARCHAR));
 		compile();
 		logger.debug("Exiting from OrderSubmit() constructor ");
 	}

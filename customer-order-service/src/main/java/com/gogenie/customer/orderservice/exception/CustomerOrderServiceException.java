@@ -48,4 +48,9 @@ public class CustomerOrderServiceException extends Exception {
 		this.errorCode = errCode;
 		this.errorDesc = errDec;
 	}
+
+	public CustomerOrderServiceException(String errCode,  String errDec) {
+		this.errorCode = errCode;
+		this.errorDesc = errDec;
+	}
 }

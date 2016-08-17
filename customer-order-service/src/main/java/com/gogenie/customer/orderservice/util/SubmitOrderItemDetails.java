@@ -33,7 +33,8 @@ public class SubmitOrderItemDetails extends StoredProcedure {
 		declareParameter(new SqlParameter("menu_item_size", Types.INTEGER));
 		declareParameter(new SqlParameter("createdby" , Types.VARCHAR));
 		declareParameter(new SqlParameter("createddate",  Types.DATE));
-		declareParameter(new SqlOutParameter("error_status" , Types.VARCHAR));
+		declareParameter(new SqlOutParameter("estatus" , Types.VARCHAR));
+		declareParameter(new SqlOutParameter("sstatus" , Types.VARCHAR));
 		compile();
 		logger.debug("Exiting from the SubmitOrderItemDetails constructor ()");
 	}
