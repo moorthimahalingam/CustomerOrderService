@@ -6,11 +6,14 @@ import javax.inject.Inject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.gogenie.customer.orderservice.exception.CustomerOrderServiceException;
@@ -37,7 +40,8 @@ public class OrderServiceController {
 
 	@RequestMapping(value = "/history", method = RequestMethod.GET)
 	public List<OrderDetailResponse> retrieveCustomerOrderHistory(
-			@RequestParam(value = "customerId") Integer customerId) throws CustomerOrderServiceException {
+			@RequestParam(value = "customer_id", required = true) Integer customerId)
+			throws CustomerOrderServiceException {
 		logger.debug("Entering into retrieveCustomerOrderHistory()");
 		List<OrderDetailResponse> listOfOrders = service.historyOfOrders(customerId);
 		logger.debug("Exiting from retrieveCustomerOrderHistory()");
@@ -45,8 +49,8 @@ public class OrderServiceController {
 	}
 
 	@RequestMapping(value = "/status", method = RequestMethod.GET)
-	public OrderDetailResponse retrieveOrderCurrentStatus(@RequestParam(value = "orderId") Long orderId)
-			throws CustomerOrderServiceException {
+	public OrderDetailResponse retrieveOrderCurrentStatus(
+			@RequestParam(value = "order_id", required = true) Long orderId) throws CustomerOrderServiceException {
 		logger.debug("Entering into retrieveOrderCurrentStatus()");
 		OrderDetailResponse response = service.trackAnExistingOrder(orderId);
 		logger.debug("Exiting from retrieveOrderCurrentStatus()");
@@ -54,12 +58,14 @@ public class OrderServiceController {
 	}
 
 	@RequestMapping(value = "/addToFavorite", method = RequestMethod.PUT)
-	public String addOrderAsFavorite(@RequestParam(value = "orderId") Long orderId,
-			@RequestParam(value = "customerId") Integer customerId) throws CustomerOrderServiceException {
+	public String addOrderAsFavorite(@RequestParam(value = "order_id", required = true) Long orderId,
+			@RequestParam(value = "customer_id", required = true) Integer customerId)
+			throws CustomerOrderServiceException {
 		logger.debug("Entering into addOrderAsFavorite()");
 		String status = service.addOrderAsCustomerFav(customerId, orderId);
 		logger.debug("Exiting from addOrderAsFavorite()");
-		return status;
+		status = "Order id " + orderId + " is added in your favorite list";
+		return "{\"responseText\": \"" + status + "\"}";
 	}
 
 	@RequestMapping(value = "/reorder", method = RequestMethod.POST)
@@ -72,4 +78,9 @@ public class OrderServiceController {
 		return reponse;
 	}
 
+	@ExceptionHandler(CustomerOrderServiceException.class)
+	@ResponseStatus(HttpStatus.CONFLICT)
+	public String exceptionHandler(CustomerOrderServiceException exception) {
+		return "{\"errorResponse\":" + exception.getErrorDesc() + "}";
+	}
 }

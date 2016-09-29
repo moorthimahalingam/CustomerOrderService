@@ -14,7 +14,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
-import org.springframework.jdbc.core.simple.SimpleJdbcCall;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 
@@ -24,6 +23,7 @@ import com.gogenie.customer.orderservice.model.Menu;
 import com.gogenie.customer.orderservice.model.OrderDetailResponse;
 import com.gogenie.customer.orderservice.model.SubmitOrder;
 import com.gogenie.customer.orderservice.util.OrderDetailsExtractor;
+import com.gogenie.customer.orderservice.util.OrderServiceConstants;
 import com.gogenie.customer.orderservice.util.OrderStatusExtractor;
 import com.gogenie.customer.orderservice.util.OrderSubmit;
 import com.gogenie.customer.orderservice.util.SubmitOrderItemDetails;
@@ -36,8 +36,6 @@ public class OrderTrackingDAOImpl implements OrderTrackingDAO {
 
 	Logger logger = LoggerFactory.getLogger(OrderTrackingDAOImpl.class);
 
-	private SimpleJdbcCall jdbcCall;
-
 	private SimpleJdbcInsert jdbcInsert;
 
 	private JdbcTemplate jdbcTemplate;
@@ -48,7 +46,6 @@ public class OrderTrackingDAOImpl implements OrderTrackingDAO {
 	public void setupDataSource() {
 		jdbcTemplate = new JdbcTemplate(gogenieDataSource);
 		namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(gogenieDataSource);
-		jdbcCall = new SimpleJdbcCall(gogenieDataSource);
 		jdbcInsert = new SimpleJdbcInsert(gogenieDataSource);
 
 	}
@@ -65,14 +62,10 @@ public class OrderTrackingDAOImpl implements OrderTrackingDAO {
 			if (resultSet.get("estatus") != null) {
 				errorMessageHandler((String)resultSet.get("estatus"));
 			}
-			
-//			List<Map> orderIdResult = (List) resultSet.get("#result-set-1");
-//			logger.debug("Order list {} is ", orderIdResult.toString());
-//			orderId = (Long) orderIdResult.get(0).get("returnOrderId");
 			orderId = (Long) resultSet.get("sstatus");
 			logger.debug("Order id for this new order is {} ", orderId);
 			logger.debug("Begin into Insert Order Item details ");
-			if (orderId > 0) {
+			if (orderId != null && orderId > 0) {
 				SubmitOrderItemDetails orderItemDetails = new SubmitOrderItemDetails(gogenieDataSource);
 				for (Menu menu : request.getMenus()) {
 					orderItemDetails.submitMenuOrderItemDetails(menu, orderId);
@@ -82,13 +75,19 @@ public class OrderTrackingDAOImpl implements OrderTrackingDAO {
 			orderDetailResponse = new OrderDetailResponse();
 			orderDetailResponse.setOrderId(orderId);
 		} catch (Exception e) {
+			logger.error("Error in submitting new order {}" , e.getMessage());
 			if (orderId > 0) {
 				jdbcTemplate.execute("delete from order_item_detail where order_id =" + orderId);
 				jdbcTemplate.execute("delete from customer_order where order_id =" + orderId);
 				logger.error("Order Id {} has been revoked ", orderId);
 				logger.error("Rollback the inserted order details from the table");
 			}
-			throw new CustomerOrderServiceException(e, "submitAnOrder");
+			if(e instanceof CustomerOrderServiceException) {
+				CustomerOrderServiceException exception = (CustomerOrderServiceException)e;
+				throw exception;
+			}
+			throw new CustomerOrderServiceException(OrderServiceConstants.ORDER_SERVICE_0001, 
+					OrderServiceConstants.ORDER_SERVICE_0001_DESC);
 		}
 		logger.debug("Exiting from submitAnOrder()");
 		return orderDetailResponse;
@@ -102,7 +101,9 @@ public class OrderTrackingDAOImpl implements OrderTrackingDAO {
 			response = namedParameterJdbcTemplate.query("{call get_customer_order_status(:orderId)}",
 					inputParam, new OrderStatusExtractor());
 		} catch (Exception e) {
-			throw new CustomerOrderServiceException(e, "orderStatusOfAnExistingOrder");
+			logger.error("Error while retrieving the order status {}" , e.getMessage());
+			throw new CustomerOrderServiceException(OrderServiceConstants.ORDER_SERVICE_0002,
+					OrderServiceConstants.ORDER_SERVICE_0002_DESC);
 		}
 		logger.debug("Exiting from orderStatusOfAnExistingOrder()");
 		return response;
@@ -111,9 +112,16 @@ public class OrderTrackingDAOImpl implements OrderTrackingDAO {
 	public List<OrderDetailResponse> retrieveCustomerOrdersHistory(Integer customerId)
 			throws CustomerOrderServiceException {
 		logger.debug("Entering into retrieveCustomerOrdersHistory()");
-		SqlParameterSource inputParam = new MapSqlParameterSource().addValue("custid", customerId);
-		List<OrderDetailResponse> response = namedParameterJdbcTemplate.query("{call get_customer_order(:custid)}",
-				inputParam, new OrderDetailsExtractor());
+		List<OrderDetailResponse> response;
+		try {
+			SqlParameterSource inputParam = new MapSqlParameterSource().addValue("custid", customerId);
+			response = namedParameterJdbcTemplate.query("{call get_customer_order(:custid)}",
+					inputParam, new OrderDetailsExtractor());
+		} catch (Exception e) {
+			logger.error("Error while retrieving order history {} " , e.getMessage());
+			throw new CustomerOrderServiceException(OrderServiceConstants.ORDER_SERVICE_0003,
+					OrderServiceConstants.ORDER_SERVICE_0003_DESC);
+		}
 		logger.debug("Exiting from retrieveCustomerOrdersHistory()");
 		return response;
 	}

@@ -5,6 +5,14 @@ public class CustomerOrderServiceException extends Exception {
 	private String errorCode;
 	private String errorDesc;
 	
+	public String getErrorCode() {
+		return errorCode;
+	}
+
+	public String getErrorDesc() {
+		return errorDesc;
+	}
+
 	/**
 	 * 
 	 */

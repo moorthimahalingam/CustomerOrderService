@@ -42,7 +42,7 @@ public class OrderSubmit extends StoredProcedure {
 		declareParameter(new SqlParameter("createddate", Types.DATE));
 		declareParameter(new SqlParameter("contact_phone", Types.VARCHAR));
 		declareParameter(new SqlOutParameter("estatus", Types.VARCHAR));
-		declareParameter(new SqlOutParameter("sstatus", Types.VARCHAR));
+		declareParameter(new SqlOutParameter("sstatus", Types.BIGINT));
 		compile();
 		logger.debug("Exiting from OrderSubmit() constructor ");
 	}
@@ -64,7 +64,7 @@ public class OrderSubmit extends StoredProcedure {
 		newOrderDetails.put("service_charge", request.getServiceCharge());
 		newOrderDetails.put("delivery_fee", request.getDeliveryFee());
 		newOrderDetails.put("card_txn_fee", request.getCardTxnFee());
-		newOrderDetails.put("createdby", "12312321");
+		newOrderDetails.put("createdby", "gogenie");
 		newOrderDetails.put("createddate", new java.sql.Date(new Date().getTime()));
 		newOrderDetails.put("contact_phone", request.getContactPhone());
 		Map<String, Object> orderResults = super.execute(newOrderDetails);
